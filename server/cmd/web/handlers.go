@@ -46,8 +46,11 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.log_channel <- fmt.Sprintf("Snippet %d requested", id)
+
 	app.infoLog.Printf("Fetching snippet %d", id)
 	fmt.Fprintf(w, "Displaying snippet %d", id)
+
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
@@ -58,4 +61,11 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintln(w, "Create snippet")
+}
+
+func (app *application) log_worker() {
+	for msg := range app.log_channel {
+		app.infoLog.Println(msg)
+	}
+	defer app.infoLog.Println("Log worker stopped")
 }

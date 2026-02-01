@@ -8,8 +8,9 @@ import (
 )
 
 type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
+	errorLog    *log.Logger
+	infoLog     *log.Logger
+	log_channel chan string
 }
 
 func main() {
@@ -23,6 +24,8 @@ func main() {
 		infoLog:  infoLog,
 		errorLog: errorLog,
 	}
+
+	go app.log_worker()
 
 	srv := &http.Server{
 		Addr:     *addr,
