@@ -1,15 +1,18 @@
-import { books, logout } from "../api/api.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchBooks } from "../api/api";
+import { useCart } from "../context/CartContext";
 
 function Home() {
-    const [cart, setCart] = useState([]);
+    const [books, setBooks] = useState([]);
+    const { addItem } = useCart();
 
-    const addToCart = (book) => {
-        const updatedCart = [...cart, book];
-        setCart(updatedCart);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
-    };
+    useEffect(() => {
+        (async () => {
+            const b = await fetchBooks();
+            setBooks(b);
+        })();
+    }, []);
 
     return (
         <div className="p-6">
@@ -19,15 +22,6 @@ function Home() {
                     <Link to="/cart" className="text-indigo-600 font-medium">
                         Cart
                     </Link>
-                    <button
-                        onClick={() => {
-                            logout();
-                            window.location.href = "/login";
-                        }}
-                        className="text-red-500"
-                    >
-                        Logout
-                    </button>
                 </div>
             </div>
 
@@ -47,12 +41,17 @@ function Home() {
                         <p className="font-bold mt-1">${book.price}</p>
 
                         {/* Push button to bottom */}
-                        <button
-                            onClick={() => addToCart(book)}
-                            className="mt-auto w-full bg-indigo-500 text-white py-1.5 rounded hover:bg-indigo-600 transition"
-                        >
-                            Add to Cart
-                        </button>
+                        <div className="mt-auto">
+                            <Link to={`/product/${book.id}`} className="text-sm text-indigo-600">
+                                Details
+                            </Link>
+                            <button
+                                onClick={() => addItem(book, 1)}
+                                className="mt-2 w-full bg-indigo-500 text-white py-1.5 rounded hover:bg-indigo-600 transition"
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
 
                 ))}

@@ -10,27 +10,54 @@ import (
 )
 
 type OrdersHandler struct {
-	Store      *store.MemoryStore
+	Store      store.Store
 	OrderQueue chan int
 }
 
-func (h *OrdersHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var o models.Order
-	json.NewDecoder(r.Body).Decode(&o)
-	created := h.Store.CreateOrder(o)
-
-	h.OrderQueue <- created.ID
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(created)
+func (h *OrdersHandler) Orders(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		json.NewEncoder(w).Encode(h.Store.ListOrders())
+	case http.MethodPost:
+		var o models.Order
+		json.NewDecoder(r.Body).Decode(&o)
+		created := h.Store.CreateOrder(o)
+		h.OrderQueue <- created.ID
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(created)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
-func (h *OrdersHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+func (h *OrdersHandler) OrderByID(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(r.URL.Query().Get("id"))
-	o, ok := h.Store.GetOrder(id)
-	if !ok {
-		http.NotFound(w, r)
-		return
+	switch r.Method {
+	case http.MethodGet:
+		o, ok := h.Store.GetOrder(id)
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		json.NewEncoder(w).Encode(o)
+	case http.MethodPut:
+		var o models.Order
+		json.NewDecoder(r.Body).Decode(&o)
+		o.ID = id
+		updated, err := h.Store.UpdateOrder(o)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		json.NewEncoder(w).Encode(updated)
+	case http.MethodDelete:
+		err := h.Store.DeleteOrder(id)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
-	json.NewEncoder(w).Encode(o)
 }
