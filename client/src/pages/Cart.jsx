@@ -1,4 +1,4 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router";
 import {useCart} from "../context/CartContext";
 
 
@@ -15,7 +15,7 @@ function Cart() {
     };
 
     return (
-        <div className="p-6">
+        <div className="p-6 max-w-6xl mx-auto">
             <Link to="/" className="text-indigo-600">Back</Link>
             <h1 className="text-3xl font-bold my-4">Shopping Cart</h1>
 

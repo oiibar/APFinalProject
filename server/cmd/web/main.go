@@ -46,6 +46,8 @@ func main() {
 
 	handler := routes.Routes(mux, st, q)
 
+	handler = middleware.CORSMiddleware(handler)
+
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,

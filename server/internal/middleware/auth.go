@@ -17,7 +17,16 @@ const ContextUserID = contextKey("user_id")
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract Bearer Token
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Authorization, Content-Type, X-CSRF-Token")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
 		auth := r.Header.Get("Authorization")
 		if auth == "" {
 			next.ServeHTTP(w, r)
@@ -29,7 +38,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		// Parse & Validate JWT
 		tokStr := parts[1]
 		token, err := jwt.Parse(tokStr, func(token *jwt.Token) (interface{}, error) {
 			return JwtKey, nil

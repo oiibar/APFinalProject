@@ -93,5 +93,5 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{"access_token": ss, "token_type": "bearer", "expires_in": 900})
+	json.NewEncoder(w).Encode(map[string]interface{}{"email": req.Email, "id": u.ID, "access_token": ss, "expires_in": 900})
 }
