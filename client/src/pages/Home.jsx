@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { fetchBooks } from "../api/api";
-import { useCart } from "../context/CartContext";
+import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {fetchBooks} from "../api/api";
+import {useCart} from "../context/CartContext";
 
 function Home() {
     const [books, setBooks] = useState([]);
-    const { addItem } = useCart();
+    const {addItem} = useCart();
 
     useEffect(() => {
         (async () => {
@@ -40,7 +40,6 @@ function Home() {
                         <p className="text-sm text-gray-600">{book.author}</p>
                         <p className="font-bold mt-1">${book.price}</p>
 
-                        {/* Push button to bottom */}
                         <div className="mt-auto">
                             <Link to={`/product/${book.id}`} className="text-sm text-indigo-600">
                                 Details

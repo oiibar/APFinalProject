@@ -1,119 +1,106 @@
-// Placeholder hard-coded dataset and fake API functions for frontend prototyping
 export const books = [
     {
         id: "book-1",
-        title: "Введение в Go",
-        author: "Иван Иванов",
-        price: 19.99,
-        image: "https://images.unsplash.com/photo-1512820790803-83ca734da794",
-        description: "Практическое введение в Go.",
-        pages: 320,
-        publisher: "TechPress",
-        isbn: "978-1-1111-1111",
+        title: "Book 1",
+        author: "John Doe",
+        price: 9.99,
+        image: "https://placehold.co/70x70",
+        description: "Book 1 description.",
+        pages: 200,
+        publisher: "Publisher 1",
         stock: 8,
     },
     {
         id: "book-2",
-        title: "React для начинающих",
-        author: "Анна Петрова",
-        price: 24.5,
-        image: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f",
-        description: "Шаг за шагом к SPA.",
-        pages: 280,
-        publisher: "WebBooks",
-        isbn: "978-2-2222-2222",
+        title: "Book 2",
+        author: "John Doe",
+        price: 9.99,
+        image: "https://placehold.co/70x70",
+        description: "Book 2 description.",
+        pages: 300,
+        publisher: "Publisher 2",
         stock: 5,
     },
     {
         id: "book-3",
-        title: "Алгоритмы и структуры данных",
-        author: "К. Смит",
-        price: 29.0,
-        image: "https://images.unsplash.com/photo-1519681393784-d120267933ba",
-        description: "Классика по алгоритмам.",
-        pages: 600,
-        publisher: "AlgoPub",
-        isbn: "978-3-3333-3333",
+        title: "Book 3",
+        author: "John Doe",
+        price: 9.99,
+        image: "https://placehold.co/70x70",
+        description: "Book 3 description.",
+        pages: 400,
+        publisher: "Publisher 3",
         stock: 3,
     },
     {
         id: "book-4",
-        title: "CSS современные практики",
-        author: "Мария Ли",
-        price: 18.75,
-        image: "https://images.unsplash.com/photo-1493119508027-2b584f234d6c",
-        description: "Советы по современному CSS.",
-        pages: 200,
-        publisher: "DesignHub",
-        isbn: "978-4-4444-4444",
+        title: "Book 4",
+        author: "John Doe",
+        price: 9.99,
+        image: "https://placehold.co/70x70",
+        description: "Book 4 description.",
+        pages: 500,
+        publisher: "Publisher 4",
         stock: 10,
     },
     {
         id: "book-6",
-        title: "Тестирование веб‑приложений",
-        author: "Екатерина Новикова",
-        price: 16.99,
-        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853",
-        description: "Подходы к тестированию фронтенда.",
-        pages: 240,
-        publisher: "QApress",
-        isbn: "978-6-6666-6666",
+        title: "Book 5",
+        author: "John Doe",
+        price: 9.99,
+        image: "https://placehold.co/70x70",
+        description: "Book 5 description.",
+        pages: 100,
+        publisher: "Publisher 5",
         stock: 6,
     },
 ];
 
-// Simple in-memory users list for demo (will persist to localStorage on register)
-const LOCAL_USERS_KEY = "demo_users_v1";
-const LOCAL_CART_KEY = "demo_cart_v1";
-
 const getStoredUsers = () => {
     try {
-        const raw = localStorage.getItem(LOCAL_USERS_KEY);
-        return raw ? JSON.parse(raw) : [{ id: "user-1", name: "Guest", email: "guest@example.com", password: "password" }];
+        const raw = localStorage.getItem("user");
+        return raw ? JSON.parse(raw) : [{
+            id: "user-1",
+            name: "Guest",
+            email: "guest@example.com",
+            password: "password"
+        }];
     } catch {
-        return [{ id: "user-1", name: "Guest", email: "guest@example.com", password: "password" }];
+        return [{id: "user-1", name: "Guest", email: "guest@example.com", password: "password"}];
     }
 };
 
 const setStoredUsers = (users) => {
-    localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+    localStorage.setItem("user", JSON.stringify(users));
 };
 
-// API emulation: small delays to simulate network
-const delay = (ms = 300) => new Promise((res) => setTimeout(res, ms));
-
-export const fetchBooks = async () => {
-    await delay(200);
+export const fetchBooks = () => {
     return books;
 };
 
-export const fetchBookById = async (id) => {
-    await delay(150);
+export const fetchBookById = (id) => {
     return books.find((b) => b.id === id) || null;
 };
 
-export const login = async ({ email, password }) => {
-    await delay(200);
+export const login = ({email, password}) => {
     const users = getStoredUsers();
     const user = users.find((u) => u.email === email && u.password === password);
     if (!user) throw new Error("Invalid credentials");
-    localStorage.setItem("auth_user", JSON.stringify({ id: user.id, name: user.name, email: user.email }));
-    return { id: user.id, name: user.name, email: user.email };
+    localStorage.setItem("auth_user", JSON.stringify({id: user.id, name: user.name, email: user.email}));
+    return {id: user.id, name: user.name, email: user.email};
 };
 
-export const register = async ({ name, email, password }) => {
-    await delay(250);
+export const register = async ({name, email, password}) => {
     const users = getStoredUsers();
     if (users.find((u) => u.email === email)) throw new Error("Email already used");
-    const newUser = { id: `user-${Date.now()}`, name, email, password };
+    const newUser = {id: `user-${Date.now()}`, name, email, password};
     users.push(newUser);
     setStoredUsers(users);
-    localStorage.setItem("auth_user", JSON.stringify({ id: newUser.id, name: newUser.name, email: newUser.email }));
-    return { id: newUser.id, name: newUser.name, email: newUser.email };
+    localStorage.setItem("auth_user", JSON.stringify({id: newUser.id, name: newUser.name, email: newUser.email}));
+    return {id: newUser.id, name: newUser.name, email: newUser.email};
 };
 
-export const logout = async () => {
-    await delay(50);
+export const logout = () => {
     localStorage.removeItem("auth_user");
 };
 
@@ -126,30 +113,25 @@ export const getCurrentUser = () => {
     }
 };
 
-export const getCart = async () => {
-    await delay(100);
+export const getCart = () => {
     try {
-        const raw = localStorage.getItem(LOCAL_CART_KEY);
+        const raw = localStorage.getItem("cart");
         return raw ? JSON.parse(raw) : [];
     } catch {
         return [];
     }
 };
 
-export const updateCart = async (cart) => {
-    await delay(120);
-    localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
+export const updateCart = (cart) => {
+    localStorage.setItem("cart", JSON.stringify(cart));
     return cart;
 };
 
-export const createOrder = async ({ user, items, address }) => {
-    await delay(300);
-    // simple validation
+export const createOrder = ({user, items, address}) => {
     if (!items || items.length === 0) throw new Error("Cart is empty");
     const orderId = `order-${Date.now()}`;
-    // For demo, just clear cart
-    localStorage.removeItem(LOCAL_CART_KEY);
-    return { orderId, user, items, address, createdAt: new Date().toISOString() };
+    localStorage.removeItem("cart");
+    return {orderId, user, items, address, createdAt: new Date().toISOString()};
 };
 
 export const isAuthenticated = () => {

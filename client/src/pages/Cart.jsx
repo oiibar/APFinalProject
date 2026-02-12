@@ -1,12 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import {Link, useNavigate} from "react-router-dom";
+import {useCart} from "../context/CartContext";
 
 
 function Cart() {
-    const { items, subtotal, updateQuantity, removeItem } = useCart();
+    const {items, subtotal, updateQuantity, removeItem} = useCart();
     const navigate = useNavigate();
 
-    const changeQty = (id, delta) => {
+    const changeNumber = (id, delta) => {
         const it = items.find((x) => x.id === id);
         if (!it) return;
         const next = Math.max(1, (it.quantity || 1) + delta);
@@ -32,9 +32,9 @@ function Cart() {
 
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center border rounded">
-                                    <button onClick={() => changeQty(item.id, -1)} className="px-3">-</button>
+                                    <button onClick={() => changeNumber(item.id, -1)} className="px-3">-</button>
                                     <div className="px-3">{item.quantity || 1}</div>
-                                    <button onClick={() => changeQty(item.id, 1)} className="px-3">+</button>
+                                    <button onClick={() => changeNumber(item.id, 1)} className="px-3">+</button>
                                 </div>
 
                                 <div className="w-24 text-right">${(item.price * (item.quantity || 1)).toFixed(2)}</div>
@@ -46,7 +46,9 @@ function Cart() {
 
                     <div className="font-bold text-xl">Total: ${subtotal.toFixed(2)}</div>
                     <div className="flex gap-3">
-                        <button onClick={() => navigate('/checkout')} className="bg-indigo-600 text-white px-4 py-2 rounded">Proceed to Checkout</button>
+                        <button onClick={() => navigate('/checkout')}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded">Proceed to Checkout
+                        </button>
                         <Link to="/" className="px-4 py-2 border rounded">Continue shopping</Link>
                     </div>
                 </div>
