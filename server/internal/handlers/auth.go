@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -35,17 +36,25 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req signupRequest
-	json.NewDecoder(r.Body).Decode(&req)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	req.Name = strings.TrimSpace(req.Name)
+	req.Email = strings.TrimSpace(req.Email)
+	if req.Name == "" || req.Email == "" || len(req.Password) < 6 {
+		writeError(w, http.StatusBadRequest, "name, email and password (min 6 chars) are required")
+		return
+	}
 
 	if _, ok := h.Store.GetUserByEmail(req.Email); ok {
-		w.WriteHeader(http.StatusConflict)
-		json.NewEncoder(w).Encode(map[string]string{"error": "email already registered"})
+		writeError(w, http.StatusConflict, "email already registered")
 		return
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "could not create user")
 		return
 	}
 
@@ -58,8 +67,12 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	created, _ := h.Store.CreateUser(u)
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{"id": created.ID, "email": created.Email})
+	writeJSON(w, http.StatusCreated, map[string]interface{}{
+		"id":    created.ID,
+		"name":  created.Name,
+		"email": created.Email,
+		"role":  created.Role,
+	})
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -68,30 +81,48 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req loginRequest
-	json.NewDecoder(r.Body).Decode(&req)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	req.Email = strings.TrimSpace(req.Email)
+	if req.Email == "" || req.Password == "" {
+		writeError(w, http.StatusBadRequest, "email and password are required")
+		return
+	}
 
 	u, ok := h.Store.GetUserByEmail(req.Email)
 	if !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid credentials"})
+		writeError(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(req.Password)); err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{"error": "invalid credentials"})
+		writeError(w, http.StatusUnauthorized, "invalid credentials")
 		return
 	}
 
+	exp := time.Now().Add(15 * time.Minute)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": u.ID,
-		"exp":     time.Now().Add(15 * time.Minute).Unix(),
+		"role":    u.Role,
+		"exp":     exp.Unix(),
 	})
 	ss, err := token.SignedString(JwtKey)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		writeError(w, http.StatusInternalServerError, "could not sign token")
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{"access_token": ss, "token_type": "bearer", "expires_in": 900})
+	writeJSON(w, http.StatusOK, map[string]interface{}{
+		"access_token": ss,
+		"token_type":   "bearer",
+		"expires_in":   int(time.Until(exp).Seconds()),
+		"user": map[string]interface{}{
+			"id":    u.ID,
+			"name":  u.Name,
+			"email": u.Email,
+			"role":  u.Role,
+		},
+	})
 }
