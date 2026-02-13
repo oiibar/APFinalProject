@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { fetchBookById } from "../api/api";
-import { useCart } from "../context/CartContext";
+import {useEffect, useState} from "react";
+import {useParams, Link} from "react-router";
+import {fetchBookById} from "../api/api";
+import {useCart} from "../context/CartContext";
 
-export default function Product() {
-    const { id } = useParams();
+export default function Book() {
+    const {id} = useParams();
     const [book, setBook] = useState(null);
-    const { addItem } = useCart();
+    const {addItem} = useCart();
 
     useEffect(() => {
         (async () => {
@@ -21,16 +21,15 @@ export default function Product() {
         <div className="p-6 max-w-4xl mx-auto">
             <Link to="/" className="text-indigo-600">Back</Link>
             <div className="flex gap-6 mt-4 items-start">
-                <img src={book.image} alt={book.title} className="w-72 h-96 object-cover rounded" />
+                <img src="https://placehold.co/70x70" alt={book.title} className="w-72 h-96 object-cover rounded"/>
                 <div>
                     <h1 className="text-2xl font-bold">{book.title}</h1>
                     <p className="text-gray-600">by {book.author}</p>
                     <p className="mt-4">{book.description}</p>
                     <div className="mt-4">
                         <div>Pages: {book.pages}</div>
-                        <div>Publisher: {book.publisher}</div>
-                        <div>ISBN: {book.isbn}</div>
-                        <div>In stock: {book.stock}</div>
+                        {/*<div>Publisher: {book.publisher}</div>*/}
+                        {/*<div>In stock: {book.stock}</div>*/}
                         <div className="text-2xl font-bold mt-2">${book.price}</div>
                     </div>
 

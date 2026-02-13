@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { fetchBooks } from "../api/api";
-import { useCart } from "../context/CartContext";
+import {useEffect, useState} from "react";
+import {Link} from "react-router";
+import {fetchBooks} from "../api/api";
+import {useCart} from "../context/CartContext";
 
 function Home() {
     const [books, setBooks] = useState([]);
-    const { addItem } = useCart();
+    const {addItem} = useCart();
 
     useEffect(() => {
         (async () => {
@@ -26,35 +26,36 @@ function Home() {
             </div>
 
             <div className="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                {books.map((book) => (
-                    <div
-                        key={book.id}
-                        className="bg-white rounded-lg shadow-md p-4 w-60 flex flex-col"
-                    >
-                        <img
-                            src={book.image}
-                            alt={book.title}
-                            className="w-full h-40 object-cover rounded"
-                        />
-                        <h2 className="text-lg font-semibold mt-2">{book.title}</h2>
-                        <p className="text-sm text-gray-600">{book.author}</p>
-                        <p className="font-bold mt-1">${book.price}</p>
+                {books.length === 0 ? (<p>No Books</p>) : (
+                    books.map((book) => (
+                        <div
+                            key={book.id}
+                            className="bg-white rounded-lg shadow-md p-4 w-60 flex flex-col"
+                        >
+                            <img
+                                src="https://placehold.co/70x70"
+                                alt={book.title}
+                                className="w-full h-40 object-cover rounded"
+                            />
+                            <h2 className="text-lg font-semibold mt-2">{book.title}</h2>
+                            <p className="text-sm text-gray-600">{book.author}</p>
+                            <p className="font-bold mt-1">${book.price}</p>
 
-                        {/* Push button to bottom */}
-                        <div className="mt-auto">
-                            <Link to={`/product/${book.id}`} className="text-sm text-indigo-600">
-                                Details
-                            </Link>
-                            <button
-                                onClick={() => addItem(book, 1)}
-                                className="mt-2 w-full bg-indigo-500 text-white py-1.5 rounded hover:bg-indigo-600 transition"
-                            >
-                                Add to Cart
-                            </button>
+                            <div className="mt-auto">
+                                <Link to={`/product/${book.id}`} className="text-sm text-indigo-600">
+                                    Details
+                                </Link>
+                                <button
+                                    onClick={() => addItem(book, 1)}
+                                    className="mt-2 w-full bg-indigo-500 text-white py-1.5 rounded hover:bg-indigo-600 transition"
+                                >
+                                    Add to Cart
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                ))}
+                    ))
+                )}
             </div>
         </div>
     );

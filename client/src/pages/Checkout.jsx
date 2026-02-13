@@ -41,10 +41,6 @@ export default function Checkout() {
 
             <form onSubmit={handleSubmit} className="space-y-3 bg-white p-4 rounded shadow">
                 <div>
-                    <label className="block text-sm text-gray-700">Name</label>
-                    <input className="w-full border p-2 rounded" value={user?.name || ""} readOnly />
-                </div>
-                <div>
                     <label className="block text-sm text-gray-700">Email</label>
                     <input className="w-full border p-2 rounded" value={user?.email || ""} readOnly />
                 </div>
