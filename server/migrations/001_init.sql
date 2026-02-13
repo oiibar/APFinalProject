@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS users (
+id SERIAL PRIMARY KEY,
+name TEXT NOT NULL,
+email TEXT NOT NULL UNIQUE,
+password_hash TEXT NOT NULL,
+role TEXT NOT NULL DEFAULT 'user',
+created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS books (
+id SERIAL PRIMARY KEY,
+title TEXT NOT NULL,
+author TEXT NOT NULL,
+price NUMERIC(10,2) NOT NULL CHECK (price > 0),
+image TEXT,
+description TEXT,
+category TEXT,
+created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+id SERIAL PRIMARY KEY,
+user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+status TEXT NOT NULL DEFAULT 'pending',
+total NUMERIC(10,2) NOT NULL DEFAULT 0,
+created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS order_items (
+id SERIAL PRIMARY KEY,
+order_id INT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+book_id INT NOT NULL REFERENCES books(id),
+quantity INT NOT NULL CHECK (quantity > 0),
+unit_price NUMERIC(10,2) NOT NULL CHECK (unit_price > 0)
+);

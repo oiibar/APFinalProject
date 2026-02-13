@@ -98,6 +98,18 @@ func (s *MemoryStore) ListOrders() []models.Order {
 	}
 	return out
 }
+
+func (s *MemoryStore) ListOrdersByUser(userID int) []models.Order {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := []models.Order{}
+	for _, o := range s.Orders {
+		if o.UserID == userID {
+			out = append(out, o)
+		}
+	}
+	return out
+}
 func (s *MemoryStore) GetOrder(id int) (models.Order, bool) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -125,12 +137,16 @@ func (s *MemoryStore) DeleteOrder(id int) error {
 	delete(s.Orders, id)
 	return nil
 }
-func (s *MemoryStore) UpdateOrderStatus(id int, status string) {
+func (s *MemoryStore) UpdateOrderStatus(id int, status string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	o := s.Orders[id]
+	o, ok := s.Orders[id]
+	if !ok {
+		return ErrNotFound
+	}
 	o.Status = status
 	s.Orders[id] = o
+	return nil
 }
 
 func (s *MemoryStore) CreateUser(u models.User) (models.User, error) {

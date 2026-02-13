@@ -7,5 +7,6 @@ type Book struct {
 	Title     string    `json:"title"`
 	Price     float64   `json:"price"`
 	Author    string    `json:"author"`
+	Image     string    `json:"image"`
 	CreatedAt time.Time `json:"createdAt"`
 }

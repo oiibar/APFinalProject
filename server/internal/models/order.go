@@ -3,8 +3,9 @@ package models
 import "time"
 
 type OrderItem struct {
-	BookID   int `json:"bookId"`
-	Quantity int `json:"quantity"`
+	BookID    int     `json:"bookId"`
+	Quantity  int     `json:"quantity"`
+	UnitPrice float64 `json:"unitPrice"`
 }
 
 type Order struct {

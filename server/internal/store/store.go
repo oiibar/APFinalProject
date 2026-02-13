@@ -18,8 +18,9 @@ type Store interface {
 
 	CreateOrder(models.Order) models.Order
 	ListOrders() []models.Order
+	ListOrdersByUser(userID int) []models.Order
 	GetOrder(int) (models.Order, bool)
 	UpdateOrder(models.Order) (models.Order, error)
 	DeleteOrder(int) error
-	UpdateOrderStatus(int, string)
+	UpdateOrderStatus(id int, status string) error
 }
